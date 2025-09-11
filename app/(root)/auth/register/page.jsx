@@ -22,26 +22,34 @@ import z from "zod";
 import Link from "next/link";
 import { WEBSITE_REGISTER } from "@/routes/WebsiteRoute";
 
-const LoginPage = () => {
+function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [isTypePassword, setIsTypePassword] = useState(true);
   const formSchema = zSchema
     .pick({
+      name: true,
       email: true,
+      password: true,
     })
     .extend({
-      password: z.string().min("5", "password field required"),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      path: ["confirmPassword"],
+      message: "Passwords do not match",
     });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const handleLoginSubmit = async (values) => {
+  const handleRegisterSubmit = async (values) => {
     console.log(values);
   };
 
@@ -58,13 +66,34 @@ const LoginPage = () => {
           />
         </div>
         <div className="text-center">
-          <h3 className="text-3xl font-semibold">Login Your Account</h3>
-          <p>Login your account below input field</p>
+          <h3 className="text-3xl font-semibold">Create Account!</h3>
+          <p>Create your account below input field</p>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleLoginSubmit)}>
+            <form onSubmit={form.handleSubmit(handleRegisterSubmit)}>
+              {/* Full Name */}
+              <div className="mb-3">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Sohanur Rahman"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              {/* Email */}
               <div className="mb-3">
                 <FormField
                   control={form.control}
@@ -84,6 +113,7 @@ const LoginPage = () => {
                   )}
                 />
               </div>
+              {/* password */}
               <div className="mb-3">
                 <FormField
                   control={form.control}
@@ -91,6 +121,27 @@ const LoginPage = () => {
                   render={({ field }) => (
                     <FormItem className=" relative">
                       <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="**********"
+                          {...field}
+                        />
+                      </FormControl>
+
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              {/* confirmPassword */}
+              <div className="mb-3">
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem className=" relative">
+                      <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
                         <Input
                           type={isTypePassword ? "password" : "text"}
@@ -141,6 +192,6 @@ const LoginPage = () => {
       </CardContent>
     </Card>
   );
-};
+}
 
-export default LoginPage;
+export default RegisterPage;
